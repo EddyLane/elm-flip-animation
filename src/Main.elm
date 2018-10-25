@@ -5,7 +5,7 @@ import Animation.Flip as Flip
 import Animation.Spring.Presets as Presets
 import Browser
 import Html exposing (..)
-import Html.Attributes exposing (class, src, style)
+import Html.Attributes exposing (class, classList, src, style)
 import Html.Events exposing (onClick)
 import Json.Decode as Decode
 import Json.Encode as Encode
@@ -55,15 +55,6 @@ flipConfig =
     , getBoundingClientRects = getBoundingClientRects
     , gotBoundingClientRects = gotBoundingClientRects
     , spring = Presets.stiff
-    , childElement = always div
-    , childAttrs = always [ class "panel-block" ]
-    , childContents =
-        \child ->
-            [ span [ class "panel-icon" ]
-                [ i [ class "fas", class child.icon ] []
-                ]
-            , text child.label
-            ]
     }
 
 
@@ -130,7 +121,7 @@ update msg model =
 
         SetViewMode viewMode ->
             ( { model | viewMode = viewMode }
-            , Cmd.none
+            , Flip.updatePositions flipConfig model.children
             )
 
         NoOp ->
@@ -169,9 +160,77 @@ viewListPanel : Model -> Html Msg
 viewListPanel model =
     nav [ class "panel" ]
         [ p [ class "panel-heading" ] [ text "Animated stuff" ]
-        , div [ style "position" "relative" ] <|
-            Flip.render flipConfig model.flip model.children
+        , p [ class "panel-tabs" ]
+            [ a
+                [ classList [ ( "is-active", model.viewMode == List ) ]
+                , onClick (SetViewMode List)
+                ]
+                [ span [ class "icon" ]
+                    [ i [ class "fas fa-list" ] []
+                    ]
+                , text "List"
+                ]
+            , a
+                [ classList [ ( "is-active", model.viewMode == Grid ) ]
+                , onClick (SetViewMode Grid)
+                ]
+                [ span [ class "icon" ]
+                    [ i [ class "fas fa-th-large" ] []
+                    ]
+                , text "Grid"
+                ]
+            ]
+        , div (flipContainerAttributes model.viewMode) <|
+            Flip.render
+                { config = flipConfig
+                , children = model.children
+                , state = model.flip
+                , childElement = always div
+                , childAttrs = flipItemAttributes model.viewMode
+                , childContents = flipItemContents model.viewMode
+                }
         ]
+
+
+flipContainerAttributes : ViewMode -> List (Html.Attribute Msg)
+flipContainerAttributes viewMode =
+    case viewMode of
+        Grid ->
+            [ style "position" "relative"
+            , style "display" "flex"
+            , style "flex-flow" "row wrap"
+            , style "with" "100%"
+            ]
+
+        List ->
+            [ style "position" "relative" ]
+
+
+flipItemContents : ViewMode -> FlipItem -> List (Html.Html Msg)
+flipItemContents viewMode flipItem =
+    [ span [ class "panel-icon" ]
+        [ i
+            [ class "fas"
+            , class flipItem.icon
+            ]
+            []
+        ]
+    , text flipItem.label
+    ]
+
+
+flipItemAttributes : ViewMode -> FlipItem -> List (Html.Attribute Msg)
+flipItemAttributes viewMode _ =
+    case viewMode of
+        Grid ->
+            [ class "panel-block"
+            , class "m-sm"
+            , style "flex" "auto"
+            ]
+
+        List ->
+            [ class "panel-block"
+            ]
 
 
 

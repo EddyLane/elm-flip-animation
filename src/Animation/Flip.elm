@@ -1,4 +1,4 @@
-module Animation.Flip exposing (Configuration, State, animate, init, render, subscriptions, updatePositions)
+module Animation.Flip exposing (Configuration, RenderConfig, State, animate, init, render, subscriptions, updatePositions)
 
 import Animation
 import Animation.Spring.Presets exposing (Spring)
@@ -18,9 +18,6 @@ import Set exposing (Set)
 
 type alias Configuration child msg =
     { id : child -> String
-    , childAttrs : child -> List (Attribute msg)
-    , childElement : child -> List (Attribute msg) -> List (Html msg) -> Html msg
-    , childContents : child -> List (Html.Html msg)
     , updateMsg : State -> Cmd msg -> msg
     , animateMsg : String -> Animation.Msg -> msg
     , getBoundingClientRects : Encode.Value -> Cmd msg
@@ -67,25 +64,35 @@ animate animationMsg id (State state) =
 ---- VIEW ----
 
 
+type alias RenderConfig child msg =
+    { config : Configuration child msg
+    , state : State
+    , children : List child
+    , childAttrs : child -> List (Attribute msg)
+    , childElement : child -> List (Attribute msg) -> List (Html msg) -> Html msg
+    , childContents : child -> List (Html.Html msg)
+    }
+
+
 flipAttributeName : String
 flipAttributeName =
     "data-elm-flip-id"
 
 
-render : Configuration child msg -> State -> List child -> List (Html msg)
-render config (State state) children =
+render : RenderConfig child msg -> List (Html msg)
+render renderConfig =
     List.concat
-        [ List.map (renderVisibleChild config state) children
-        , List.map (renderHiddenChild config) children
+        [ List.map (renderVisibleChild renderConfig) renderConfig.children
+        , List.map (renderHiddenChild renderConfig) renderConfig.children
         ]
 
 
-renderHiddenChild : Configuration child msg -> child -> Html msg
-renderHiddenChild { id, childAttrs, childElement, childContents } child =
+renderHiddenChild : RenderConfig child msg -> child -> Html msg
+renderHiddenChild { config, childAttrs, childElement, childContents } child =
     childElement child
         (List.concat
             [ childAttrs child
-            , [ attribute flipAttributeName (id child)
+            , [ attribute flipAttributeName (config.id child)
               , style "visibility" "hidden"
               ]
             ]
@@ -93,9 +100,13 @@ renderHiddenChild { id, childAttrs, childElement, childContents } child =
         (childContents child)
 
 
-renderVisibleChild : Configuration child msg -> StateRec -> child -> Html msg
-renderVisibleChild { id, childAttrs, childElement, childContents } { animations } child =
-    case Dict.get (id child) animations of
+renderVisibleChild : RenderConfig child msg -> child -> Html msg
+renderVisibleChild { config, state, childAttrs, childElement, childContents } child =
+    let
+        (State { animations }) =
+            state
+    in
+    case Dict.get (config.id child) animations of
         Just animation ->
             childElement child
                 (List.concat

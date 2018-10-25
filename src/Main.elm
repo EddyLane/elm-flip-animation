@@ -30,24 +30,40 @@ port gotBoundingClientRects : (Decode.Value -> msg) -> Sub msg
 type alias Model =
     { flip : Flip.State
     , children : List FlipItem
+    , removed : List FlipItem
+    , viewMode : ViewMode
     }
 
 
 type alias FlipItem =
-    { id : String, label : String }
+    { id : String
+    , label : String
+    , icon : String
+    }
+
+
+type ViewMode
+    = List
+    | Grid
 
 
 flipConfig : Flip.Configuration FlipItem Msg
 flipConfig =
     { id = .id
-    , childAttrs = always [ class "panel-block" ]
-    , childElement = always div
-    , childContents = \child -> [ text child.label ]
     , updateMsg = UpdateFlip
     , animateMsg = AnimateFlip
     , getBoundingClientRects = getBoundingClientRects
     , gotBoundingClientRects = gotBoundingClientRects
     , spring = Presets.stiff
+    , childElement = always div
+    , childAttrs = always [ class "panel-block" ]
+    , childContents =
+        \child ->
+            [ span [ class "panel-icon" ]
+                [ i [ class "fas", class child.icon ] []
+                ]
+            , text child.label
+            ]
     }
 
 
@@ -55,15 +71,13 @@ init : ( Model, Cmd Msg )
 init =
     let
         flipItems =
-            [ { id = "1", label = "I am the first child" }
-            , { id = "2", label = "I am the second child" }
-            , { id = "3", label = "I am the third child" }
-            , { id = "4", label = "I am the fourth child" }
-            , { id = "5", label = "I am the fifth child" }
-            , { id = "6", label = "I am the sixth child" }
-            , { id = "7", label = "I am the seventh child" }
-            , { id = "8", label = "I am the eighth child" }
-            , { id = "9", label = "I am the nineth child" }
+            [ { id = "1", label = "Get rid of all of the spiders", icon = "fa-spider" }
+            , { id = "2", label = "Learn to write Haskell", icon = "fa-language" }
+            , { id = "3", label = "Water the plants", icon = "fa-seedling" }
+            , { id = "4", label = "Eat a cookie ", icon = "fa-cookie" }
+            , { id = "5", label = "I can't see anything", icon = "fa-low-vision" }
+            , { id = "6", label = "I love to eat Nandos", icon = "fa-grin-hearts" }
+            , { id = "7", label = "Front page of the internet", icon = "fa-globe" }
             ]
 
         ( flip, flipCmd ) =
@@ -71,6 +85,8 @@ init =
     in
     ( { flip = flip
       , children = flipItems
+      , removed = []
+      , viewMode = List
       }
     , flipCmd
     )
@@ -86,6 +102,7 @@ type Msg
     | AnimateFlip String Animation.Msg
     | Shuffle
     | Shuffled (List FlipItem)
+    | SetViewMode ViewMode
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -111,6 +128,11 @@ update msg model =
             , Flip.updatePositions flipConfig children
             )
 
+        SetViewMode viewMode ->
+            ( { model | viewMode = viewMode }
+            , Cmd.none
+            )
+
         NoOp ->
             ( model, Cmd.none )
 
@@ -126,7 +148,18 @@ view model =
             [ div [ class "column" ]
                 [ viewListPanel model ]
             , div [ class "column is-one-quarter" ]
-                [ button [ class "button is-fullwidth is-info", onClick Shuffle ] [ text "Shuffle" ]
+                [ button
+                    [ class "button is-fullwidth is-info m-b-sm"
+                    , onClick Shuffle
+                    ]
+                    [ span [ class "icon p-r-lg" ]
+                        [ i [ class "fas fa-random" ] []
+                        ]
+                    , text "Shuffle"
+                    ]
+                , button
+                    [ class "button is-fullwidth is-info" ]
+                    [ text "Remove Item" ]
                 ]
             ]
         ]
@@ -134,7 +167,11 @@ view model =
 
 viewListPanel : Model -> Html Msg
 viewListPanel model =
-    nav [ class "panel", style "position" "relative" ] (Flip.render flipConfig model.flip model.children)
+    nav [ class "panel" ]
+        [ p [ class "panel-heading" ] [ text "Animated stuff" ]
+        , div [ style "position" "relative" ] <|
+            Flip.render flipConfig model.flip model.children
+        ]
 
 
 

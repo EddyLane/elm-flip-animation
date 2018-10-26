@@ -2,6 +2,7 @@ module Animation.Flip exposing (Configuration, RenderConfig, State, animate, ini
 
 import Animation
 import Animation.Spring.Presets exposing (Spring)
+import Browser.Events
 import DOM
 import Dict exposing (Dict)
 import Html exposing (Attribute, Html, text)
@@ -125,11 +126,13 @@ renderVisibleChild { config, state, childAttrs, childElement, childContents } ch
 ---- SUBSCRIPTIONS ----
 
 
-subscriptions : Configuration child msg -> State -> Sub msg
-subscriptions config (State state) =
+subscriptions : Configuration child msg -> State -> List child -> Sub msg
+subscriptions config (State state) children =
     Sub.batch
         [ gotBoundingRectsSubs config state
         , animateSubs config state
+        , Browser.Events.onResize (\_ _ -> config.updateMsg (State state) (updatePositions config children))
+        , Browser.Events.onAnimationFrame (always <| config.updateMsg (State state) (updatePositions config children))
         ]
 
 

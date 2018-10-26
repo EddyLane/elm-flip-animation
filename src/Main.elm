@@ -5,8 +5,8 @@ import Animation.Flip as Flip
 import Animation.Spring.Presets as Presets
 import Browser
 import Html exposing (..)
-import Html.Attributes exposing (class, classList, src, style)
-import Html.Events exposing (onClick)
+import Html.Attributes exposing (class, classList, placeholder, src, style, type_, value)
+import Html.Events exposing (onClick, onInput)
 import Json.Decode as Decode
 import Json.Encode as Encode
 import Random
@@ -32,6 +32,7 @@ type alias Model =
     , children : List FlipItem
     , removed : List FlipItem
     , viewMode : ViewMode
+    , searchInputValue : String
     }
 
 
@@ -78,6 +79,7 @@ init =
       , children = flipItems
       , removed = []
       , viewMode = List
+      , searchInputValue = ""
       }
     , flipCmd
     )
@@ -94,6 +96,7 @@ type Msg
     | Shuffle
     | Shuffled (List FlipItem)
     | SetViewMode ViewMode
+    | SetSearchInputValue String
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -116,12 +119,17 @@ update msg model =
 
         Shuffled children ->
             ( { model | children = children }
-            , Flip.updatePositions flipConfig children
+            , Cmd.none
             )
 
         SetViewMode viewMode ->
             ( { model | viewMode = viewMode }
-            , Flip.updatePositions flipConfig model.children
+            , Cmd.none
+            )
+
+        SetSearchInputValue searchInputValue ->
+            ( { model | searchInputValue = searchInputValue }
+            , Cmd.none
             )
 
         NoOp ->
@@ -148,9 +156,6 @@ view model =
                         ]
                     , text "Shuffle"
                     ]
-                , button
-                    [ class "button is-fullwidth is-info" ]
-                    [ text "Remove Item" ]
                 ]
             ]
         ]
@@ -158,8 +163,30 @@ view model =
 
 viewListPanel : Model -> Html Msg
 viewListPanel model =
-    nav [ class "panel" ]
+    nav
+        [ class "panel"
+        , style "background-color" "white"
+        , style "max-height" "600px"
+        , style "height" "auto"
+        , style "transition" "max-height 3s ease-out"
+        ]
         [ p [ class "panel-heading" ] [ text "Animated stuff" ]
+        , div [ class "panel-block" ]
+            [ p [ class "control has-icons-left" ]
+                [ input
+                    [ class "input is-small"
+                    , placeholder "search"
+                    , type_ "text"
+                    , value model.searchInputValue
+                    , onInput SetSearchInputValue
+                    ]
+                    []
+                , span [ class "icon is-small is-left" ]
+                    [ i [ class "fas fa-search" ]
+                        []
+                    ]
+                ]
+            ]
         , p [ class "panel-tabs" ]
             [ a
                 [ classList [ ( "is-active", model.viewMode == List ) ]
@@ -186,8 +213,8 @@ viewListPanel model =
                 , children = model.children
                 , state = model.flip
                 , childElement = always div
-                , childAttrs = flipItemAttributes model.viewMode
-                , childContents = flipItemContents model.viewMode
+                , childAttrs = flipItemAttributes model.viewMode model.searchInputValue
+                , childContents = flipItemContents model.viewMode model.searchInputValue
                 }
         ]
 
@@ -199,15 +226,14 @@ flipContainerAttributes viewMode =
             [ style "position" "relative"
             , style "display" "flex"
             , style "flex-flow" "row wrap"
-            , style "with" "100%"
             ]
 
         List ->
             [ style "position" "relative" ]
 
 
-flipItemContents : ViewMode -> FlipItem -> List (Html.Html Msg)
-flipItemContents viewMode flipItem =
+flipItemContents : ViewMode -> String -> FlipItem -> List (Html.Html Msg)
+flipItemContents viewMode filterQuery flipItem =
     [ span [ class "panel-icon" ]
         [ i
             [ class "fas"
@@ -219,18 +245,32 @@ flipItemContents viewMode flipItem =
     ]
 
 
-flipItemAttributes : ViewMode -> FlipItem -> List (Html.Attribute Msg)
-flipItemAttributes viewMode _ =
+flipItemAttributes : ViewMode -> String -> FlipItem -> List (Html.Attribute Msg)
+flipItemAttributes viewMode filterQuery flipItem =
     case viewMode of
         Grid ->
             [ class "panel-block"
-            , class "m-sm"
             , style "flex" "auto"
+            , flipItemClassList filterQuery flipItem
             ]
 
         List ->
             [ class "panel-block"
+            , flipItemClassList filterQuery flipItem
             ]
+
+
+flipItemClassList : String -> FlipItem -> Html.Attribute Msg
+flipItemClassList filterQuery flipItem =
+    classList
+        [ ( "flip-item-hidden"
+          , if filterQuery == "" then
+                False
+
+            else
+                not <| String.contains (String.toLower filterQuery) (String.toLower flipItem.label)
+          )
+        ]
 
 
 
@@ -239,7 +279,7 @@ flipItemAttributes viewMode _ =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Flip.subscriptions flipConfig model.flip
+    Flip.subscriptions flipConfig model.flip model.children
 
 
 

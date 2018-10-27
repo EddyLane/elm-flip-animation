@@ -1,8 +1,8 @@
 {
   "type": "application",
   "source-directories": [
-    "../src",
-   "."
+    ".",
+    "../src"
   ],
   "elm-version": "0.19.0",
   "dependencies": {
@@ -23,5 +23,10 @@
       "elm/virtual-dom": "1.0.0"
     }
   },
-  "test-dependencies": { }
+  "test-dependencies": {
+    "direct": {
+      "elm-explorations/test": "1.0.0"
+    },
+    "indirect": {}
+  }
 }

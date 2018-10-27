@@ -90,8 +90,7 @@ init =
 
 
 type Msg
-    = NoOp
-    | UpdateFlip Flip.State (Cmd Msg)
+    = UpdateFlip Flip.State (Cmd Msg)
     | AnimateFlip String Animation.Msg
     | Shuffle
     | Shuffled (List FlipItem)
@@ -131,9 +130,6 @@ update msg model =
             ( { model | searchInputValue = searchInputValue }
             , Cmd.none
             )
-
-        NoOp ->
-            ( model, Cmd.none )
 
 
 

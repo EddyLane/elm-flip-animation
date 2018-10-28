@@ -133,6 +133,6 @@ Flip.render
     , state = model.flip
     , childElement = always div
     , childAttrs = always []
-    , childContents = always [ text "Hello world" ]
+    , childContents = (\child -> [ text child.label ])
     }
 ```

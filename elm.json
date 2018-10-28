@@ -3,7 +3,7 @@
     "name": "eddylane/elm-flip-animation",
     "summary": "FLIP Style Animations in Elm",
     "license": "BSD-3-Clause",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "exposed-modules": [
         "Animation.Flip"
     ],

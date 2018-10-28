@@ -71,8 +71,8 @@ module.exports = {
     // Generated JS file names (with nested folders).
     // There will be one main bundle, and one file per asynchronous chunk.
     // We don't currently advertise code splitting but Webpack supports it.
-    filename: 'static/js/[name]..js',
-    chunkFilename: 'static/js/[name]..chunk.js',
+    filename: 'static/js/[name].js',
+    chunkFilename: 'static/js/[name].chunk.js',
     // We inferred the "public path" (such as / or /my-project) from homepage.
     publicPath: publicPath,
     // Point sourcemap entries to original disk location (format as URL on Windows)
@@ -265,7 +265,7 @@ module.exports = {
         loader: require.resolve('url-loader'),
         options: {
           limit: 10000,
-          name: 'static/media/[name].[hash:8].[ext]'
+          name: 'static/media/[name].[ext]'
         }
       },
       // "file" loader for svg
@@ -273,7 +273,7 @@ module.exports = {
         test: /\.svg$/,
         loader: require.resolve('file-loader'),
         options: {
-          name: 'static/media/[name].[hash:8].[ext]'
+          name: 'static/media/[name].[ext]'
         }
       }
     ]
@@ -284,16 +284,16 @@ module.exports = {
       inject: true,
       template: paths.appHtml,
       minify: {
-        removeComments: true,
-        collapseWhitespace: true,
+        removeComments: false,
+        collapseWhitespace: false,
         removeRedundantAttributes: true,
         useShortDoctype: true,
         removeEmptyAttributes: true,
         removeStyleLinkTypeAttributes: true,
         keepClosingSlash: true,
-        minifyJS: true,
-        minifyCSS: true,
-        minifyURLs: true
+        minifyJS: false,
+        minifyCSS: false,
+        minifyURLs: false
       }
     }),
     // Makes some environment variables available in index.html.
@@ -311,8 +311,8 @@ module.exports = {
     new MiniCssExtractPlugin({
       // Options similar to the same options in webpackOptions.output
       // both options are optional
-      filename: 'static/css/[name].[contenthash:8].css',
-      chunkFilename: 'static/css/[name].[contenthash:8].chunk.css'
+      filename: 'static/css/[name].css',
+      chunkFilename: 'static/css/[name].chunk.css'
     }),
     // Generate a manifest file which contains a mapping of all asset filenames
     // to their corresponding output file so that tools can pick it up without

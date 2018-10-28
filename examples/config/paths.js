@@ -74,7 +74,7 @@ module.exports = {
   appSrc: resolveApp('./src'),
   dotenv: resolveApp('./.env'),
   entry: resolveApp('./src/index.js'),
-  appBuild: resolveApp('./build'),
+  appBuild: resolveApp('../docs'),
   elmJson: resolveApp('./elm.json'),
   elm: require.resolve('elm/bin/elm'),
   publicUrl: getPublicUrl(config),

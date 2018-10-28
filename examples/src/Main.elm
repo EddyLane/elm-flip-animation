@@ -30,7 +30,6 @@ port gotBoundingClientRects : (Decode.Value -> msg) -> Sub msg
 type alias Model =
     { flip : Flip.State
     , children : List FlipItem
-    , removed : List FlipItem
     , viewMode : ViewMode
     , searchInputValue : String
     }
@@ -77,7 +76,6 @@ init =
     in
     ( { flip = flip
       , children = flipItems
-      , removed = []
       , viewMode = List
       , searchInputValue = ""
       }

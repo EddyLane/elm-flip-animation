@@ -1,14 +1,13 @@
 {
     "type": "package",
-    "source-directories": [
-        "src"
-    ],
     "name": "eddylane/elm-flip-animation",
     "summary": "FLIP Style Animations in Elm",
     "license": "BSD-3-Clause",
-    "exposed-modules": [ "Animation.Flip" ],
+    "version": "1.0.1",
+    "exposed-modules": [
+        "Animation.Flip"
+    ],
     "elm-version": "0.19.0 <= v < 0.20.0",
-    "version": "1.0.0",
     "dependencies": {
         "debois/elm-dom": "1.0.0 <= v <= 2.0.0",
         "elm/browser": "1.0.0 <= v <= 2.0.0",

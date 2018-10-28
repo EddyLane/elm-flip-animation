@@ -136,3 +136,8 @@ Flip.render
     , childContents = (\child -> [ text child.label ])
     }
 ```
+
+## Examples
+
+For for some reason currently with 0.19.0 version of elm there is an error whilst using this library when not using the 
+--optimize flag. Sorry about that. Hopefully this will be fixed soon in elm core.

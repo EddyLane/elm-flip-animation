@@ -1,11 +1,11 @@
 {
-  "main.css": "/static/css/main.chunk.css",
-  "main.js": "/static/js/main.chunk.js",
-  "main.css.map": "/static/css/main.chunk.css.map",
-  "main.js.map": "/static/js/main.chunk.js.map",
-  "runtime~main.js": "/static/js/runtime~main.js",
-  "runtime~main.js.map": "/static/js/runtime~main.js.map",
-  "vendors~main.js": "/static/js/vendors~main.chunk.js",
-  "vendors~main.js.map": "/static/js/vendors~main.chunk.js.map",
-  "index.html": "/index.html"
+  "main.css": "https://eddylane.github.io/elm-flip-animation/static/css/main.chunk.css",
+  "main.js": "https://eddylane.github.io/elm-flip-animation/static/js/main.chunk.js",
+  "main.css.map": "https://eddylane.github.io/elm-flip-animation/static/css/main.chunk.css.map",
+  "main.js.map": "https://eddylane.github.io/elm-flip-animation/static/js/main.chunk.js.map",
+  "runtime~main.js": "https://eddylane.github.io/elm-flip-animation/static/js/runtime~main.js",
+  "runtime~main.js.map": "https://eddylane.github.io/elm-flip-animation/static/js/runtime~main.js.map",
+  "vendors~main.js": "https://eddylane.github.io/elm-flip-animation/static/js/vendors~main.chunk.js",
+  "vendors~main.js.map": "https://eddylane.github.io/elm-flip-animation/static/js/vendors~main.chunk.js.map",
+  "index.html": "https://eddylane.github.io/elm-flip-animation/index.html"
 }

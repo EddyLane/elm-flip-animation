@@ -54,7 +54,10 @@ flipConfig =
     , animateMsg = AnimateFlip
     , getBoundingClientRects = getBoundingClientRects
     , gotBoundingClientRects = gotBoundingClientRects
-    , spring = Presets.stiff
+    , spring =
+        { stiffness = 210
+        , damping = 20
+        }
     }
 
 

@@ -76,6 +76,7 @@ update msg model =
 
 __Init flip__.
 ```elm
+
 type alias FlipItem =
     { id : String
     , label : String
@@ -89,9 +90,11 @@ flipConfig =
     , animateMsg = AnimateFlip
     , getBoundingClientRects = getBoundingClientRects
     , gotBoundingClientRects = gotBoundingClientRects
-    , spring = Presets.stiff
+    , spring =
+        { stiffness = 210
+        , damping = 20
+        }
     }
-
 
 init : ( Model, Cmd Msg )
 init =

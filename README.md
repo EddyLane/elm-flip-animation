@@ -1,6 +1,9 @@
 # FLIP animations with Elm
 
-Well sortof.
+- [Example application](https://eddylane.github.io/elm-flip-animation)
+- [Example application source](https://github.com/EddyLane/elm-flip-animation/tree/master/examples)
+
+## Introduction
 
 Usually [FLIP animations](https://medium.com/developers-writing/animating-the-unanimatable-1346a5aab3cd) are achieved in 
 react by hooking into lifecycle methods. Unfortunately this is not possible in elm. 

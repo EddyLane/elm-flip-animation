@@ -1,4 +1,33 @@
-module Animation.Flip exposing (Configuration, RenderConfig, State, animate, init, render, subscriptions, updatePositions)
+module Animation.Flip exposing
+    ( Configuration, RenderConfig
+    , State, init
+    , render, animate
+    , subscriptions
+    )
+
+{-| Provides a simple way of achieving FLIP style animations.
+
+
+# Configuration
+
+@docs Configuration, RenderConfig
+
+
+# State
+
+@docs State, init
+
+
+# Animate
+
+@docs render, animate
+
+
+# Subscriptions
+
+@docs subscriptions
+
+-}
 
 import Animation
 import Animation.Spring.Presets exposing (Spring)
@@ -17,6 +46,8 @@ import Set exposing (Set)
 ---- CONFIGURATION ----
 
 
+{-| Configuration for the flip animation
+-}
 type alias Configuration child msg =
     { id : child -> String
     , updateMsg : State -> Cmd msg -> msg
@@ -31,6 +62,8 @@ type alias Configuration child msg =
 ---- STATE ----
 
 
+{-| Opaque type for the state of the animation
+-}
 type State
     = State StateRec
 
@@ -39,11 +72,20 @@ type alias StateRec =
     { animations : Dict String Animation.State }
 
 
+{-| Init a fresh flip animation
+-}
 init : Configuration child msg -> List child -> ( State, Cmd msg )
 init config children =
     ( State { animations = Dict.empty }
     , updatePositions config children
     )
+
+
+{-| Update the position of an element in the flip animation
+-}
+animate : Animation.Msg -> String -> State -> State
+animate animationMsg id (State state) =
+    State { state | animations = Dict.update id (Maybe.map (Animation.update animationMsg)) state.animations }
 
 
 updatePositions : Configuration child msg -> List child -> Cmd msg
@@ -56,15 +98,22 @@ updatePositions config children =
         )
 
 
-animate : Animation.Msg -> String -> State -> State
-animate animationMsg id (State state) =
-    State { state | animations = Dict.update id (Maybe.map (Animation.update animationMsg)) state.animations }
-
-
 
 ---- VIEW ----
 
 
+{-| Render configuration for the flip animation, including the overall config
+
+    Flip.render
+        { config = flipConfig
+        , children = model.children
+        , state = model.flip
+        , childElement = always div
+        , childAttrs = always []
+        , childContents = .label >> text
+        }
+
+-}
 type alias RenderConfig child msg =
     { config : Configuration child msg
     , state : State
@@ -80,6 +129,11 @@ flipAttributeName =
     "data-elm-flip-id"
 
 
+{-| Render a flip animation.
+
+More info on method and reasoning soon!
+
+-}
 render : RenderConfig child msg -> List (Html msg)
 render renderConfig =
     List.concat
@@ -126,13 +180,19 @@ renderVisibleChild { config, state, childAttrs, childElement, childContents } ch
 ---- SUBSCRIPTIONS ----
 
 
+{-| Flip subscriptions
+-}
 subscriptions : Configuration child msg -> State -> List child -> Sub msg
 subscriptions config (State state) children =
+    let
+        forceUpdate =
+            config.updateMsg (State state) (updatePositions config children)
+    in
     Sub.batch
         [ gotBoundingRectsSubs config state
         , animateSubs config state
-        , Browser.Events.onResize (\_ _ -> config.updateMsg (State state) (updatePositions config children))
-        , Browser.Events.onAnimationFrame (always <| config.updateMsg (State state) (updatePositions config children))
+        , Browser.Events.onResize (\_ _ -> forceUpdate)
+        , Browser.Events.onAnimationFrame (\_ -> forceUpdate)
         ]
 
 
